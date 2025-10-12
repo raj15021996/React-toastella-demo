@@ -77,9 +77,9 @@ const getTypeColors = (type: string) => {
       };
     default:
       return {
-        bg: '#64748b',
-        text: '#ffffff',
-        border: '#e2e8f0'
+        bg: '#000',
+        text: '#fff',
+        border: '#000'
       };
   }
 };
@@ -141,21 +141,21 @@ export const ToastItem: React.FC<ToastItemProps> = ({ toast, onClose }) => {
   const typeColors = getTypeColors(toast.type || 'default');
   const isLightTheme = toast.theme === 'light';
   
-  const baseStyles = {
-    backgroundColor: `${toast.customStyles?.backgroundColor || (isLightTheme ? '#ffffff' : typeColors.bg)} !important`,
-    color: `${toast.customStyles?.textColor || (isLightTheme ? '#000000' : typeColors.text)} !important`,
-    borderColor: `${isLightTheme ? typeColors.bg : typeColors.border} !important`,
-    fontSize: `${toast.customStyles?.fontSize || '14px'} !important`,
+  const baseStyles: React.CSSProperties = {
+    backgroundColor: toast.customStyles?.backgroundColor || (isLightTheme ? '#ffffff' : typeColors.bg),
+    color: toast.customStyles?.textColor || (isLightTheme ? '#000000' : typeColors.text),
+    borderColor: isLightTheme ? typeColors.bg : typeColors.border,
+    fontSize: toast.customStyles?.fontSize || '14px',
     width: toast.customStyles?.width,
     height: toast.customStyles?.height,
     boxShadow: toast.customStyles?.boxShadow,
-    border: `${toast.customStyles?.border || `2px solid ${isLightTheme ? typeColors.bg : typeColors.border}`} !important`,
-    fontWeight: `${toast.customStyles?.fontWeight || '500'} !important`,
-    fontStyle: `${toast.customStyles?.fontStyle || 'normal'} !important`,
-  } as React.CSSProperties;
+    border: toast.customStyles?.border || `2px solid ${isLightTheme ? typeColors.bg : typeColors.border}`,
+    fontWeight: toast.customStyles?.fontWeight || '500',
+    fontStyle: toast.customStyles?.fontStyle || 'normal',
+  };
   
   const iconColor = toast.customStyles?.iconColor || (isLightTheme ? typeColors.bg : typeColors.text);
-  const progressBarColor = toast.customStyles?.progressBarColor || (isLightTheme ? (toast.type === 'default' ? '#000000' : typeColors.bg) : (toast.type === 'default' ? '#000000' : '#ffffff'));
+  const progressBarColor = toast.customStyles?.progressBarColor || (isLightTheme ? (toast.type === 'default' ? '#000000' : typeColors.bg) :  '#ffffff');
 
   const gradientStyle = toast.gradient
     ? {
@@ -186,17 +186,16 @@ export const ToastItem: React.FC<ToastItemProps> = ({ toast, onClose }) => {
           onClick={onClose}
           className="toast-close-top"
           aria-label="Close notification"
-          style={{ color: toast.customStyles?.textColor || (isLightTheme ? '#000000' : typeColors.text) } as React.CSSProperties}
         >
-          <X style={{ color: 'inherit !important' } as React.CSSProperties} />
+          <X  color={baseStyles.color} />
         </button>
       )}
       
       <div 
         className="toast-content"
-        style={{ padding: toast.customStyles?.padding || '8px' }}
+        style={{ padding: toast.customStyles?.padding || '12px' }}
       >
-        {toast.showIcon && (
+        {toast.showIcon  && (toast.type !== 'default'|| toast.customIcon) && (
           <div className="toast-icon" style={{ color: iconColor }}>
             {typeof toast.customIcon === 'string' ? (
               <img 
@@ -216,9 +215,8 @@ export const ToastItem: React.FC<ToastItemProps> = ({ toast, onClose }) => {
             onClick={onClose}
             className="toast-close-inline"
             aria-label="Close notification"
-            style={{ color: toast.customStyles?.textColor || (isLightTheme ? '#000000' : typeColors.text) } as React.CSSProperties}
           >
-            <X style={{ color: 'inherit !important' } as React.CSSProperties} />
+             <X  color={baseStyles.color} />
           </button>
         )}
       </div>
