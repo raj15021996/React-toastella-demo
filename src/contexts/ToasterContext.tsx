@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, ReactNode, useRef, useEffect } from 'react';
 import { ToastItem } from '@/components/Toaster/ToastItem';
 import '@/components/Toaster/toaster.css';
 
@@ -73,7 +73,7 @@ const getPositionClasses = (position: ToastPosition): string => {
 
 export const ToasterProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
-
+  const toastContainerRef = useRef<HTMLDivElement | null>(null);
   const addToast = useCallback((options: ToastOptions): string => {
     const id = Math.random().toString(36).substring(2, 11);
     const toast: Toast = {
@@ -119,11 +119,31 @@ export const ToasterProvider: React.FC<{ children: ReactNode }> = ({ children })
     return acc;
   }, {} as Record<ToastPosition, typeof toasts>);
 
+  useEffect(() => {
+    if (toastContainerRef.current && toasts.length > 0) {
+      const toastContainer = toastContainerRef.current;
+      toasts.forEach((toast) => {
+      if (toast.customStyles?.width) {
+        const customWidth = toast.customStyles.width;
+        // Check if the width is in pixels (e.g., "200px")
+        if (/^\d+px$/.test(customWidth) ) {
+          const widthValue = parseInt(customWidth, 10); // Get the numeric value
+          const newWidth = `${widthValue + 10}px`; // Add 20px to the width
+          toastContainer.style.setProperty('width', newWidth, 'important');
+        } else {
+          // For non-pixel values (e.g., percentages), just apply the original width
+          toastContainer.style.setProperty('width', customWidth, 'important');
+        }
+      }
+    });
+    }
+  }, [toasts]);
+
   return (
     <ToasterContext.Provider value={{ toasts, addToast, removeToast }}>
       {children}
       {Object.entries(toastsByPosition).map(([position, positionToasts]) => (
-        <div key={position} className={getPositionClasses(position as ToastPosition)}>
+        <div key={position} className={getPositionClasses(position as ToastPosition)} ref={toastContainerRef}>
           {positionToasts.map((toast) => (
             <ToastItem key={toast.id} toast={toast} onClose={() => removeToast(toast.id)} />
           ))}
