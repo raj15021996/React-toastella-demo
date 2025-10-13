@@ -128,11 +128,11 @@ export const ToasterProvider: React.FC<{ children: ReactNode }> = ({ children })
         // Check if the width is in pixels (e.g., "200px")
         if (/^\d+px$/.test(customWidth) ) {
           const widthValue = parseInt(customWidth, 10); // Get the numeric value
-          const newWidth = `${widthValue + 10}px`; // Add 20px to the width
-          toastContainer.style.setProperty('width', newWidth, 'important');
+          const newWidth = widthValue > 300 ? `${widthValue + 10}px` :`${widthValue + 20}px`; // Add 20px to the width
+          toastContainer.style.setProperty('max-width', newWidth, 'important');
         } else {
           // For non-pixel values (e.g., percentages), just apply the original width
-          toastContainer.style.setProperty('width', customWidth, 'important');
+          toastContainer.style.setProperty('max-width', customWidth, 'important');
         }
       }
     });

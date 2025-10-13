@@ -12,7 +12,7 @@
 /* Desktop - Default to top-right with fixed width */
 @media (min-width: 1024px) {
   .toast-container {
-    width: 370px;
+    max-width: 330px;
     padding: 12px;
   }
   
@@ -91,7 +91,7 @@
 @media (min-width: 1024px) {
   .toast-item {
     width: auto;
-    max-width: 370px;
+    max-width: 330px;
     border-radius: 5px;
   }
 }
