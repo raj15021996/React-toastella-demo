@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useToaster, ToastPosition, ToastAnimation, ToastType, ToastTheme } from '@/contexts/ToasterContext';
+import { useToaster, ToastPosition, ToastAnimation, ToastType, ToastTheme } from 'react-toastella';
 import { Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
