@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useToaster, ToastPosition, ToastAnimation, ToastType, ToastTheme } from 'react-toastella';
+import { addToast, ToastPosition, ToastAnimation, ToastType, ToastTheme } from '@/contexts/ToasterContext';
 import { Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,7 +12,6 @@ import { Separator } from '@/components/ui/separator';
 import { Sparkles, Package, Code2, Palette, Moon, Sun } from 'lucide-react';
 
 const Index = () => {
-  const { addToast } = useToaster();
   const [isDark, setIsDark] = useState(false);
   
   // Configuration state
@@ -647,11 +646,9 @@ const Index = () => {
               </CardHeader>
               <CardContent>
                 <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm">
-                  <code>{`import { useToaster } from '@/contexts/ToasterContext';
+                  <code>{`import { addToast } from '@/contexts/ToasterContext';
 
 const MyComponent = () => {
-  const { addToast } = useToaster();
-
   const showNotification = () => {
     addToast({
       message: "${message}",

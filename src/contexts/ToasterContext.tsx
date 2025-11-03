@@ -52,6 +52,18 @@ interface ToasterContextType {
 
 const ToasterContext = createContext<ToasterContextType | undefined>(undefined);
 
+// Standalone addToast function reference
+let addToastRef: ((options: ToastOptions) => string) | null = null;
+
+// Export standalone addToast function
+export const addToast = (options: ToastOptions): string => {
+  if (!addToastRef) {
+    console.error('ToasterProvider not mounted. Make sure ToasterProvider wraps your app.');
+    return '';
+  }
+  return addToastRef(options);
+};
+
 const getPositionClasses = (position: ToastPosition): string => {
   switch (position) {
     case 'top-left':
@@ -74,7 +86,7 @@ const getPositionClasses = (position: ToastPosition): string => {
 export const ToasterProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const toastContainerRef = useRef<HTMLDivElement | null>(null);
-  const addToast = useCallback((options: ToastOptions): string => {
+  const addToastInternal = useCallback((options: ToastOptions): string => {
     const id = Math.random().toString(36).substring(2, 11);
     const toast: Toast = {
       id,
@@ -97,6 +109,14 @@ export const ToasterProvider: React.FC<{ children: ReactNode }> = ({ children })
 
     return id;
   }, []);
+
+  // Set the reference when provider mounts
+  useEffect(() => {
+    addToastRef = addToastInternal;
+    return () => {
+      addToastRef = null;
+    };
+  }, [addToastInternal]);
 
   const removeToast = useCallback((id: string) => {
     setToasts((prev) => prev.map((toast) => 
@@ -140,7 +160,7 @@ export const ToasterProvider: React.FC<{ children: ReactNode }> = ({ children })
   }, [toasts]);
 
   return (
-    <ToasterContext.Provider value={{ toasts, addToast, removeToast }}>
+    <ToasterContext.Provider value={{ toasts, addToast: addToastInternal, removeToast }}>
       {children}
       {Object.entries(toastsByPosition).map(([position, positionToasts]) => (
         <div key={position} className={getPositionClasses(position as ToastPosition)} ref={toastContainerRef}>

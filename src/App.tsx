@@ -1,7 +1,7 @@
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ToasterProvider } from "react-toastella";
+import { ToasterProvider } from "@/contexts/ToasterContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
