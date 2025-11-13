@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { addToast, ToastPosition, ToastAnimation, ToastType, ToastTheme } from '@/contexts/ToasterContext';
+import { useToaster, ToastPosition, ToastAnimation, ToastType, ToastTheme } from 'react-toastella';
 import { Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,7 +13,7 @@ import { Sparkles, Package, Code2, Palette, Moon, Sun } from 'lucide-react';
 
 const Index = () => {
   const [isDark, setIsDark] = useState(false);
-  
+  const { notify } = useToaster()
   // Configuration state
   const [message, setMessage] = useState('Your notification message here!');
   const [type, setType] = useState<ToastType>('default');
@@ -51,7 +51,7 @@ const Index = () => {
   }, [isDark]);
 
   const showToast = () => {
-    addToast({
+    notify({
       message,
       type,
       position,
@@ -90,7 +90,7 @@ const Index = () => {
       default: 'This is a default notification.',
     };
     
-    addToast({
+    notify({
       message: messages[demoType],
       type: demoType,
       theme: 'colored',
@@ -153,7 +153,7 @@ const Index = () => {
             <h3 className="text-sm font-semibold mb-3">Light Theme Toasts</h3>
             <div className="flex flex-wrap justify-center gap-3">
               <Button 
-                onClick={() => addToast({ 
+                onClick={() => notify({ 
                   message: 'Operation completed successfully!', 
                   type: 'success',
                   theme: 'light',
@@ -167,7 +167,7 @@ const Index = () => {
                 Light Success
               </Button>
               <Button 
-                onClick={() => addToast({ 
+                onClick={() => notify({ 
                   message: 'An error occurred. Please try again.', 
                   type: 'error',
                   theme: 'light',
@@ -181,7 +181,7 @@ const Index = () => {
                 Light Error
               </Button>
               <Button 
-                onClick={() => addToast({ 
+                onClick={() => notify({ 
                   message: 'Warning: This action cannot be undone.', 
                   type: 'warning',
                   theme: 'light',
@@ -195,7 +195,7 @@ const Index = () => {
                 Light Warning
               </Button>
               <Button 
-                onClick={() => addToast({ 
+                onClick={() => notify({ 
                   message: 'Did you know? This toaster is fully customizable!', 
                   type: 'info',
                   theme: 'light',
@@ -209,7 +209,7 @@ const Index = () => {
                 Light Info
               </Button>
               <Button 
-                onClick={() => addToast({ 
+                onClick={() => notify({ 
                   message: 'This is a default notification.', 
                   type: 'default',
                   theme: 'light',
@@ -646,11 +646,11 @@ const Index = () => {
               </CardHeader>
               <CardContent>
                 <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm">
-                  <code>{`import { addToast } from '@/contexts/ToasterContext';
+                  <code>{`import { notify } from '@/contexts/ToasterContext';
 
 const MyComponent = () => {
   const showNotification = () => {
-    addToast({
+    notify({
       message: "${message}",
       type: "${type}",
       position: "${position}",

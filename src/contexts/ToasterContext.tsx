@@ -46,23 +46,11 @@ export interface Toast extends ToastOptions {
 
 interface ToasterContextType {
   toasts: Toast[];
-  addToast: (options: ToastOptions) => string;
+  notify: (options: ToastOptions) => string;
   removeToast: (id: string) => void;
 }
 
 const ToasterContext = createContext<ToasterContextType | undefined>(undefined);
-
-// Standalone addToast function reference
-let addToastRef: ((options: ToastOptions) => string) | null = null;
-
-// Export standalone addToast function
-export const addToast = (options: ToastOptions): string => {
-  if (!addToastRef) {
-    console.error('ToasterProvider not mounted. Make sure ToasterProvider wraps your app.');
-    return '';
-  }
-  return addToastRef(options);
-};
 
 const getPositionClasses = (position: ToastPosition): string => {
   switch (position) {
@@ -83,10 +71,20 @@ const getPositionClasses = (position: ToastPosition): string => {
   }
 };
 
-export const ToasterProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+// Imperative API singleton (for outside React usage)
+export const toaster = {
+  notify: ((options: ToastOptions) => {
+    throw new Error('toaster.notify is not ready: ToasterProvider is missing');
+  }) as (options: ToastOptions) => string,
+  removeToast: ((id: string) => {
+    throw new Error('toaster.removeToast is not ready: ToasterProvider is missing');
+  }) as (id: string) => void,
+};
+
+export const ToasterProvider: React.FC<{ children: any }> = ({ children }) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const toastContainerRef = useRef<HTMLDivElement | null>(null);
-  const addToastInternal = useCallback((options: ToastOptions): string => {
+  const notify = useCallback((options: ToastOptions): string => {
     const id = Math.random().toString(36).substring(2, 11);
     const toast: Toast = {
       id,
@@ -110,14 +108,6 @@ export const ToasterProvider: React.FC<{ children: ReactNode }> = ({ children })
     return id;
   }, []);
 
-  // Set the reference when provider mounts
-  useEffect(() => {
-    addToastRef = addToastInternal;
-    return () => {
-      addToastRef = null;
-    };
-  }, [addToastInternal]);
-
   const removeToast = useCallback((id: string) => {
     setToasts((prev) => prev.map((toast) => 
       toast.id === id ? { ...toast, isExiting: true } : toast
@@ -128,6 +118,12 @@ export const ToasterProvider: React.FC<{ children: ReactNode }> = ({ children })
       setToasts((prev) => prev.filter((toast) => toast.id !== id));
     }, 300);
   }, []);
+
+  // Synchronize imperative singleton on mount
+  useEffect(() => {
+    toaster.notify = notify;
+    toaster.removeToast = removeToast;
+  }, [notify, removeToast]);
 
   // Group toasts by position
   const toastsByPosition = toasts.reduce((acc, toast) => {
@@ -160,7 +156,7 @@ export const ToasterProvider: React.FC<{ children: ReactNode }> = ({ children })
   }, [toasts]);
 
   return (
-    <ToasterContext.Provider value={{ toasts, addToast: addToastInternal, removeToast }}>
+    <ToasterContext.Provider value={{ toasts, notify, removeToast }}>
       {children}
       {Object.entries(toastsByPosition).map(([position, positionToasts]) => (
         <div key={position} className={getPositionClasses(position as ToastPosition)} ref={toastContainerRef}>
